@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<title>CUCEI VIRTUAL </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="description" content="Cucei Vicrtual es un juego online. Usala libreria  Three.js y
+		 Socket.io. autores :Victor Ernesto Zamora Barbosa 2022 categoria: aplicacion-javascript" />
+		<meta property="og:title" content="Cucei Virtual" />
+		<meta property="og:description" content="Cucei Vicrtual es un juego online. Usa la libreria  Three.js y
+		Socket.io. authors:Victor Ernesto Zamora Barbosa 2022 categoria: aplicacion-javascript" />
+		<meta property="og:image:type" content="image/jpeg" />
+		<meta property="og:image:width" content="1265" />
+		<meta property="og:image:height" content="817" />
+		<meta property="og:image:alt" content="Cucei Virtual" />
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="https://www.google.com/jsapi"></script>
+		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Kavivanar" rel="stylesheet">
+		<link href="resources/css/style-chat.css" rel="stylesheet">
+		<style>@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500&display=swap');</style>
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<!-- FORMULARIO PARA VIAJE RAPIDO -->
+		<form action = "/game" id="info-session" style="display: none;" method= 'POST' >
+			<input type="text" id="respawn" name="respawn">
+			<input type="text" id="id_usuario" name="id_usuario">
+			<!--  -->
+			<input type="text" name="name"  id="name_user">
+			<input type="text" name="room"  id="room_user">
+
+			<script>
+				document.getElementById('name_user').value ='<%= name %>';
+				document.getElementById('room_user').value ='<%= room %>';
+				document.getElementById('id_usuario').value ='<%= id_usuario %>';
+			</script>
+		</form>
+
+		<!-- ICONOS -->
+		<div id = "iconos">
+			<audio src="resources/music/ambiente.mp3"> </audio>
+
+			<a type= "button" id="botonHouse"  href='/' style="color: transparent;" > 
+				<img src="resources/images/house.png"  alt="btn-house" width="35px" height="35px">
+			</a>
+
+			<button type= "button" id="boton"> 
+				<img src="resources/images/volumen.png" id="imgAudio" alt="btn-audio" width="35px" height="35px">
+			</button>
+
+			<button type= "button" id="botonChat"> 
+				<img src="resources/images/charla.png" id="imgchat" alt="btn-chat" width="35px" height="35px">
+			</button>
+			
+			<a type= "button" id="botonMap" class="botonMap"> 
+				<img src="resources/images/mapa.png" id="imgMap" alt="btn-Map" width="35px" height="35px">
+			</a>
+
+			<a type= "button" id="botonInventario" onClick="javascript:game.GetValoresInventario()"> 
+				<img src="resources/images/mochila.png" id="imgMap" alt="btn-Map" width="40px" height="40px" style="margin-left: 9px;">
+			</a>
+
+			<a type= "button" id="botonMisiones" onClick="javascript:game.GetValoresInventario()"> 
+				<img src="resources/images/estrellas.png" id="imgMap" alt="btn-Map" width="40px" height="40px" style="margin-left: 9px;">
+			</a>
+
+		</div>
+
+		<!-- DIV OCULTO DE MAPA  -->
+		<div class="Div_mapa" id="HelpShowMap" style="z-index:-1">
+			<span class="helper"></span>
+			<div id ="Div_mapa">
+				<div class="Cerrar_btn_map" id="Cerrar_btn_map">&times;</div>
+			</div>
+		</div>
+
+
+		<!-- DIV OCULTO DE MISIONES  -->
+		<div class="Div_mapa" id="HelpMisiones" style="z-index:-1">
+			<span class="helper"></span>
+			<div id ="Div_misiones" style=" background: linear-gradient(to bottom right,#87CF8E, #B8CF87); padding-top: 20px; overflow-inline: auto;">
+				<div id="helpermisions" >
+					<div class="mision">
+						<h1>Recolecta 10 Libros:        </h1>
+						<div class="progress">
+							<div id="colorlibros" class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countLibros"> 0/10 </h1>
+					</div>
+	
+					<div class="mision">
+						<h1>Recolecta 10 botellas:      </h1>
+						<div class="progress">
+							<div id="colorBotellas"class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countBotellas"> 0/10 </h1>
+					</div>
+	
+					<div class="mision">
+						<h1>Recolecta 10 Laptops:        </h1>
+						<div class="progress">
+							<div id="colorLaptops" class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countLaptop"> 0/10 </h1>
+					</div>
+	
+					<div class="mision">
+						<h1>Recolecta 10 Balones:         </h1>
+						<div class="progress">
+							<div id="colorBalon" class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countBalones"> 0/10 </h1>
+					</div>
+	
+					<div class="mision">
+						<h1>Recolecta 10 Manzanas:      </h1>
+						<div class="progress">
+							<div id="colorManzanas" class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countManzanas"> 0/10 </h1>
+					</div>
+	
+					<div class="mision">
+						<h1>Recolecta una medalla:      </h1>
+						<div class="progress">
+							<div id="colorMedalla" class="color" style="width:0%"></div>
+						</div>
+						<h1 id="countMedalla"> 0/1 </h1>
+					</div>
+
+				</div>
+				<div class="Cerrar_btn_map" id="Cerrar_btn_misiones">&times;</div>
+			</div>
+		</div>
+
+		<!-- DIV OCULTO DE INVENTARIO  -->
+		<div class="Div_mapa" id="HelpInventario" style="z-index:-1">
+			<span class="helper"></span>
+			<div id ="Div_Inventario" style="height: 60%; background: linear-gradient(to bottom right, #38FBEF, #5BAFFC);">
+				<div class="fila">
+					<div class="columna">
+						<button type="button" class="btn-columna" onClick="javascript:game.DropInventario('libro')">
+							<img src="resources/images/libro.png">
+						</button>
+						<p class="contador" id="libro">0</p>
+					</div>
+					<div class="columna">
+						<button type="button" class="btn-columna" onClick="javascript:game.DropInventario('Botella')">
+							<img src="resources/images/Botella.png">
+						</button>
+						<p class="contador" id="Botella">0</p>
+					</div>
+					<div class="columna">
+						<button type="button" class="btn-columna" onClick="javascript:game.DropInventario('Laptop')">
+							<img src="resources/images/Laptop.png">
+						</button>
+						<p class="contador" id="Laptop">0</p>
+					</div>
+				</div>
+				<div class="fila">
+					<div class="columna">
+						<button type="button" class="btn-columna">
+							<img src="resources/images/Balon.png" onClick="javascript:game.DropInventario('Balon')">
+						</button>
+						<p class="contador" id="Balon">0</p>
+					</div>
+					<div class="columna">
+						<button type="button" class="btn-columna" onClick="javascript:game.DropInventario('Manzana')">
+							<img src="resources/images/Manzana.png">
+						</button>
+						<p class="contador" id="Manzana">0</p>
+
+					</div>
+					<div class="columna">
+						<button type="button" class="btn-columna" onClick="javascript:game.DropInventario('Medalla')">
+							<img src="resources/images/Medalla.png">
+						</button>
+						<p class="contador" id="Medalla">0</p>
+
+					</div>
+				</div>
+				<div class="Cerrar_btn_map" id="Cerrar_btn_inv">&times;</div>
+			</div>
+		</div>
+
+		<!-- CHAT GLOBAL -->
+		<% if (login) { %>
+			<div id="app" class="chat">
+			
+				<section class="chat__main" id="chat__main">
+					<ol class="chat__messages">
+						<message-template v-for="msg in messages" :msg="msg" :key="msg.createAt"></message-template>
+					</ol>
+					<footer class="chat__footer">
+						<form @submit.prevent="sendMessage">
+							<input type="text" placeholder="Mensaje" required v-model="message" autofocus autocomplete="off" />
+							<button type="submit">Enviar</button>
+						</form>
+					</footer>
+				</section>
+			
+			</div>
+		<%} else { %>
+			<script>
+				document.getElementById("botonChat").style.display = "none";
+				document.getElementById("botonMisiones").style.display = "none";
+				document.getElementById("botonInventario").style.display = "none";
+			</script>
+			 <% } %>
+
+
+		
+		<!-- CHAT IN-GAME  -->
+		<div id="chat-in-game">
+			<form id="msg-form" action="">
+      			<input id="m" autocomplete="off" /><button>Enviar</button>
+    		</form>
+		</div>
+
+		<!-- EVENTOS  -->
+		<script>
+			var v = document.getElementsByTagName("audio")[0];
+			var sonido = false;
+			var chatDisplay = true;
+			var MapDisplay = false;		
+			var botonAudio = document.getElementById("boton");
+			var botonChat = document.getElementById("botonChat");
+
+			var botonMap = document.getElementById("botonMap");
+			var btnCerrarMap = document.getElementById("Cerrar_btn_map");
+
+			var botonMisiones = document.getElementById("botonMisiones");
+			var btnCerrarMisiones = document.getElementById("Cerrar_btn_misiones");
+
+			var botonInventario = document.getElementById("botonInventario");
+			var btnCerrarInventario = document.getElementById("Cerrar_btn_inv");
+
+			var game, mapa;
+
+			botonAudio.addEventListener("click",function(){
+				if (!sonido){
+					v.play();
+					document.getElementById("imgAudio").src = "resources/images/volumen.png"
+					sonido = true;
+				} else{
+					v.pause();
+					document.getElementById("imgAudio").src = "resources/images/mudo.png"
+					sonido = false;
+				}
+			})
+
+			botonChat.addEventListener("click",function(){
+				if(chatDisplay){
+					document.getElementById("imgchat").src = "resources/images/charla_none.png";
+					document.getElementById("chat__main").style.webkitAnimationName = "scale-out-hor-right-2";
+					document.getElementById("chat__main").style.webkitAnimationDuration = "0.55s";
+					document.getElementById("chat__main").style.webkitAnimationDirection = "normal";
+					document.getElementById("chat__main").style.webkitAnimationTimingFunction = "(0.550, 0.085, 0.680, 0.530)";
+					document.getElementById("chat__main").style.webkitAnimationFillMode = "both";
+					setTimeout(function(){
+						document.getElementById("chat__main").style.display = "none";
+						chatDisplay = false;
+					}, 500);
+					
+				}else{
+					document.getElementById("imgchat").src = "resources/images/charla.png";
+					document.getElementById("chat__main").style.webkitAnimationName = "scale-out-hor-right";
+					document.getElementById("chat__main").style.webkitAnimationDuration = "0.5s";
+					document.getElementById("chat__main").style.webkitAnimationDirection = "reverse";
+					document.getElementById("chat__main").style.webkitAnimationTimingFunction = "(0.550, 0.085, 0.680, 0.530)";
+					document.getElementById("chat__main").style.webkitAnimationFillMode = "both";
+					setTimeout(function(){
+						document.getElementById("chat__main").style.display = "flex";
+						chatDisplay = true;
+					}, 500);
+				}
+			})
+
+			botonMap.addEventListener("click", function(){
+				document.getElementById("HelpShowMap").style.display = "block";
+				document.getElementById("HelpShowMap").style.zIndex = 10;
+				document.getElementById("Div_mapa").style.display = "inline-block"
+				document.getElementById("Div_mapa").style.webkitAnimationName = "scale-out-center";
+				document.getElementById("Div_mapa").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_mapa").style.webkitAnimationDirection = "reverse";
+				document.getElementById("Div_mapa").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)";
+			})
+			
+			btnCerrarMap.addEventListener("click", function(){
+				document.getElementById("Div_mapa").style.webkitAnimationName = "scale-out-center-out";
+				document.getElementById("Div_mapa").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_mapa").style.webkitAnimationDirection = "normal";
+				document.getElementById("Div_mapa").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)"
+				setTimeout(function(){
+					document.getElementById("HelpShowMap").style.display = "none";
+					document.getElementById("HelpShowMap").style.zIndex = -10;
+				}, 500);
+			})
+
+			botonInventario.addEventListener("click",function(){
+				document.getElementById("HelpInventario").style.display = "block";
+				document.getElementById("HelpInventario").style.zIndex = 10;
+				document.getElementById("Div_Inventario").style.display = "inline-block"
+				document.getElementById("Div_Inventario").style.webkitAnimationName = "scale-out-center";
+				document.getElementById("Div_Inventario").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_Inventario").style.webkitAnimationDirection = "reverse";
+				document.getElementById("Div_Inventario").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)";
+			})
+
+			btnCerrarInventario.addEventListener("click",function(){
+				document.getElementById("Div_Inventario").style.webkitAnimationName = "scale-out-center-out";
+				document.getElementById("Div_Inventario").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_Inventario").style.webkitAnimationDirection = "normal";
+				document.getElementById("Div_Inventario").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)"
+				setTimeout(function(){
+					document.getElementById("HelpInventario").style.display = "none";
+					document.getElementById("HelpInventario").style.zIndex = -10;
+				}, 500);
+			})
+
+
+			botonMisiones.addEventListener("click",function(){
+				document.getElementById("HelpMisiones").style.display = "block";
+				document.getElementById("HelpMisiones").style.zIndex = 10;
+				document.getElementById("Div_misiones").style.display = "inline-block"
+				document.getElementById("Div_misiones").style.webkitAnimationName = "scale-out-center";
+				document.getElementById("Div_misiones").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_misiones").style.webkitAnimationDirection = "reverse";
+				document.getElementById("Div_misiones").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)";
+			})
+
+			btnCerrarMisiones.addEventListener("click",function(){
+				document.getElementById("Div_misiones").style.webkitAnimationName = "scale-out-center-out";
+				document.getElementById("Div_misiones").style.webkitAnimationDuration = "0.5s";
+				document.getElementById("Div_misiones").style.webkitAnimationDirection = "normal";
+				document.getElementById("Div_misiones").style.webkitAnimationTimingFunction = "(0.445, 0.050, 0.550, 0.950)"
+				setTimeout(function(){
+					document.getElementById("HelpMisiones").style.display = "none";
+					document.getElementById("HelpMisiones").style.zIndex = -10;
+				}, 500);
+			})
+
+
+
+			// Cargando juego y Mapa
+			document.addEventListener("DOMContentLoaded", function(){
+				var x = '<%= respawn %>';
+				var modelo = '<%= modelo %>';
+				var atuendo = '<%= atuendo %>';
+				var color = '<%= color %>';
+				var id_usuario = '<%= id_usuario %>';
+				
+				game = new Game(x,modelo,atuendo,color, id_usuario);
+				mapa = new Mapa();
+				document.getElementById("HelpShowMap").style.display = "none";
+				document.getElementById("Div_mapa").style.display = "none";
+			});
+		</script>
+
+		<script src="resources/js/three.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script src="/socket.io/socket.io.js"></script> 
+		<script src= "resources/js/inflate.min.js"></script>
+		<script src="resources/js/FBXLoader_12_09_18.js"></script>
+		<script src="resources/js/Detector.js"></script>
+		<script src="resources/js/toon3d.js"></script>
+		<script src="resources/js/game.js"></script>
+		<script src="resources/js/simplePeer.js"></script>
+		<script src="resources/js/datefns.js"></script>
+		<script src="resources/js/mapa-popup.js"></script>
+		<script src="resources/js/OrbitControls.js"></script>
+		<script type="module" src="resources/js/chat.js"> </script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script> 
+
+	</body>
+</html>
+
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Editar Personaje</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<!-- Main css -->
+		<!-- <link href="resources/css/style.css" rel="stylesheet"> -->
+        <style>
+            body{
+				margin: 0;
+			}
+			.myButton {
+				position:absolute;
+				box-shadow: 3px 2px 4px 2px #3dc21b;
+				background:linear-gradient(to bottom, #44c767 5%, #5cbf2a 100%);
+				background-color:#44c767;
+				border-radius:32px;
+				display:inline-block;
+				cursor:pointer;
+				color:#ffffff;
+				font-family:Verdana;
+				font-size:28px;
+				font-weight:bold;
+				padding:20px 38px;
+				text-decoration:none;
+				text-shadow:-1px 2px 5px #2f6627;
+				margin-left: 20px;
+				margin-top: 15px;
+				border: 2px;
+			}
+			.myButton:hover {
+				background:linear-gradient(to bottom, #5cbf2a 5%, #44c767 100%);
+				background-color:#5cbf2a;
+			}
+			.myButton:active {
+				position:absolute;
+			}
+			h4{
+				font-size: 20px;
+    			font-weight: 1000;
+    			color: #633991;
+			}
+			h5{
+				font-size: 14px;
+    			font-weight: 1000;
+    			color: #37125f;
+			}
+            #cambiar_anim{
+				right:20px; bottom:20px;
+			}
+			#div_estilo{
+				position:absolute; 
+				display: flex; 
+				background-color: transparent;
+				flex-direction: column;
+				padding: 10px;
+				
+				justify-content: center;
+				align-items: center;
+				align-items: stretch;
+				background: linear-gradient(135 deg,rgba(255,255,255,0.1),rgba(255,255,255,0));
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				border-radius: 10px;
+				border: 1px solid rgba(255, 255, 255,0.18);
+				box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+
+				margin-top: 60px;
+				margin-right: 20px;
+			}
+			.flecha {
+				background-color: transparent;
+				border-color: transparent;
+			}
+			#skin-save{
+				right:100px; bottom:130px;
+			}
+
+        </style>
+        
+	</head>
+
+	<body>
+        <button id = "cambiar_anim" class="myButton" onClick="javascript:game.toggleAnimation()">Cambiar Animación</button>
+		<div  >
+			<form id ="saveBTN" action="/save-skin" method = "POST" > 
+				<input type="text" id = "modeloF" name = "modeloF" style="display: none;">
+				<input type="text" id = "atuendoF" name = "atuendoF" style="display: none;">
+				<input type="text" id = "colorF" name = "colorF" style="display: none;">
+				<button  id = "skin-save" class="myButton" onClick="javascript:game.GetValues()" > Guardar</button>
+			</form>
+		</div>
+
+
+		<div style="height: 100%; width: 100%; display: flex; flex-direction: row-reverse;">
+
+			<div id="div_estilo">
+
+				<div style="display: flex; flex-direction: row;">
+					<h4>Cuerpo</h4>
+					<button id = "cambiar_body_I" class="flecha"  onClick="javascript:game.toggleModel_I()">
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px" style=" transform: scaleX(-1);">
+					</button>
+					<h5 id="modelo_name">  </h5>
+					<button id = "cambiar_body_D" class="flecha"  onClick="javascript:game.toggleModel_D()"> 
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px">
+					</button>
+
+				</div>
+	
+				<div style="display: flex; flex-direction: row;" >
+
+					<h4>Atuendo</h4>
+					<button id = "cambiar_skin_I" class="flecha" onClick="javascript:game.toggleAtuendo_I()"> 
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px" style=" transform: scaleX(-1);">
+					</button>
+					<h5 id="piel_name"> </h5>
+					<button id = "cambiar_skin_D" class="flecha"  onClick="javascript:game.toggleAtuendo_D()">
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px" > 
+					</button>
+
+				</div>
+
+				<div style="display: flex; flex-direction: row;" >
+
+					<h4>Color</h4>
+					<button id = "cambiar_color_I" class="flecha" onClick="javascript:game.toggleColor_I()"> 
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px" style=" transform: scaleX(-1);">
+					</button>
+					<h5 id="color_name"> </h5>
+					<button id = "cambiar_color_D" class="flecha" onClick="javascript:game.toggleColor_D()">
+						<img src="resources/images/flechita.png" id="flecha"  alt="btn-flecha" width="50px" height="50px" > 
+					</button>
+
+				</div>
+	
+			</div>
+		</div>
+
+
+
+		<script src="/resources/js/three.min.js"></script>
+		<script src="resources/js/inflate.min.js"></script>
+		<script src="resources/js/FBXLoader.js"></script>
+		<script src="resources/js/OrbitControls.js"></script>
+		<script src="resources/js/Detector.js"></script>
+		<script src="resources/js/skin.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function(){
+				// Opteniendo datos de atuendo del personaje del server
+				var ID = '<%= id %>'
+				var MODELO = '<%= modelo %>'
+				var ATUENDO = '<%= atuendo %>'
+				var COLOR = '<%= color %>'
+				const game = new Game(ID,MODELO,ATUENDO,COLOR);
+				window.game = game;//For debugging only
+			});
+		</script>
+	</body>
+</html>
+
