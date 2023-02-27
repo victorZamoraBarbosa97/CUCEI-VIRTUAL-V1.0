@@ -10,7 +10,7 @@ var bodyParser = require('body-parser');
 
 
 // levantar el servidor
-http.listen(2002, function(){
+http.listen(process.env.PORT || 2002, function(){
 	console.log('Escuchando el puerto 2002');
 });
   
